@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container" style="margin: 20px">
+        <div class="row">
+            <form>
+                <input type="file" name="arquivo">
+            </form>
+        </div>
+        <div class="progress" style="margin: 20px">
+            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        function ajaxUpload(config) {
+            const xhr = new XMLHttpRequest()
+            if (xhr.upload) {
+                xhr.upload.onprogress = e => {
+                    const atual = e.loaded
+                    const total = e.total
+                    const perc = Math.floor((e.loaded / e.total) * 100)
+                    config.progresso({
+                        atual,
+                        total,
+                        perc
+                    })
+                }
+                xhr.open("post", config.url, true)
+                xhr.send(config.formData)
+            }
+        }
+        document.querySelector('input[type=file]').onchange = e => {
+            const formData = new FormData()
+            formData.append(e.target.name, e.target.files[0])
+
+            ajaxUpload({
+                url: '/upload',
+                formData,
+                progresso(dados) {
+                    const progresso = document.querySelector('.progress-bar')
+                    progresso.innerHTML = JSON.stringify(`${dados.perc}%`)
+                    progresso.style = `width: ${dados.perc}%`
+                    if(dados.prec == 100){
+                        alert('Upload terminado')
+                    }
+                }
+            })
+
+        }
+    </script>
+</body>
+
+</html>
